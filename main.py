@@ -416,48 +416,6 @@ def get_message(message_id: str) -> MessageResponse:
     result = make_request("GET", endpoint)
     return MessageResponse(**result)
 
-# Health check tool
-@mcp.tool()
-def health_check() -> dict[str, str]:
-    """Check if the ActiveCampaign API is accessible via Nango."""
-    try:
-        # Test Nango connection first
-        credentials = get_connection_credentials()
-        
-        # Test API connection
-        result = make_request("GET", "/api/3/users")
-        if "error" in result:
-            return {"status": "error", "message": result["error"]}
-        
-        return {
-            "status": "ok", 
-            "message": "API connection successful via Nango",
-            "connection_id": credentials.get("connection_id"),
-            "hostname": credentials.get("connection_config", {}).get("hostname"),
-            "provider": credentials.get("provider")
-        }
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-@mcp.tool()
-def get_nango_connection_info() -> dict[str, Any]:
-    """Get information about the current Nango connection."""
-    try:
-        credentials = get_connection_credentials()
-        return {
-            "status": "success",
-            "connection_id": credentials.get("connection_id"),
-            "provider": credentials.get("provider"),
-            "provider_config_key": credentials.get("provider_config_key"),
-            "hostname": credentials.get("connection_config", {}).get("hostname"),
-            "created_at": credentials.get("created_at"),
-            "last_fetched_at": credentials.get("last_fetched_at"),
-            "end_user": credentials.get("end_user", {}),
-            "has_api_key": bool(credentials.get("credentials", {}).get("apiKey")),
-            "credential_type": credentials.get("credentials", {}).get("type")
-        }
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
 
 def run():
     # Check environment variables for Nango
